@@ -7,8 +7,8 @@
 
 ## URLs de Acceso
 - **Local**: http://localhost:3000
-- **Producción**: (Pendiente de despliegue)
-- **GitHub**: (Pendiente de configuración)
+- **Producción**: https://george-burger-menu.pages.dev
+- **GitHub**: https://github.com/Raymondevil/desdeafuera
 
 ## Características Completadas ✅
 - ✅ Menú completo con todas las categorías (Hamburguesas, Hot Dogs, Sincronizadas, Tortas, Bebidas)
@@ -100,4 +100,6 @@ npm run deploy
 
 ## Última Actualización
 - **Fecha**: 2025-01-08
-- **Estado**: ✅ Desarrollo completado, pendiente despliegue
+- **Estado**: ✅ DESPLEGADO EN PRODUCCIÓN en Cloudflare Pages
+- **Nueva función**: Búsqueda instantánea de productos por nombre
+- **URL en vivo**: https://george-burger-menu.pages.dev
