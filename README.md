@@ -7,7 +7,8 @@
 
 ## URLs de Acceso
 - **Local**: http://localhost:3000
-- **Producción**: https://george-burger-menu.pages.dev
+- **Producción**: https://georgetepic.com
+- **Cloudflare Pages**: https://george-burger-menu.pages.dev
 - **GitHub**: https://github.com/Raymondevil/desdeafuera
 
 ## Características Completadas ✅

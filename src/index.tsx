@@ -80,11 +80,17 @@ const menuData = {
     { nombre: "Torta Sencilla", ingredientes: "Telera+Pierna", precio: 50 },
     { nombre: "Torta Especial", ingredientes: "Carnes Frías+Pierna", precio: 63 },
     { nombre: "Torta Asadera", ingredientes: "Pierna+Q.Asadero", precio: 63 },
-    { nombre: "Torta Cubana", ingredientes: "Jamón+Q.Asadero+Salchicha+Pierna", precio: 101 },
+    { nombre: "Torta Cubana", ingredientes: "Jamón+Q.Asadero+Salchicha+Pierna", precio: 101 }
+  ],
+  burros: [
     { nombre: "Burro Sencillo", ingredientes: "Carne de Pierna", precio: 50 },
     { nombre: "Burro Asadero", ingredientes: "Carne de Pierna+Q.Asadero", precio: 63 },
     { nombre: "Burro Especial", ingredientes: "Carne de Pierna+Carnes Frías", precio: 63 },
     { nombre: "Burro Costeño", ingredientes: "Carne de Pierna+Camarón+Q.Asadero", precio: 106 }
+  ],
+  papas: [
+    { nombre: "Papas a la Francesa Chicas", ingredientes: "Papas fritas doradas", precio: 45 },
+    { nombre: "Papas a la Francesa Grandes", ingredientes: "Papas fritas doradas", precio: 50 }
   ],
   bebidas: [
     { nombre: "Coca-Cola", precio: 30 },
@@ -158,6 +164,17 @@ const htmlContent = `
             </div>
         </div>
 
+        <!-- Formulario para Recoger -->
+        <div id="pickupForm" class="hidden bg-gray-800 rounded-lg p-6 mb-6">
+            <h3 class="text-xl font-bold mb-4 text-yellow-400">Datos para Recoger</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block mb-2">Nombre: <span class="text-red-400">*</span></label>
+                    <input type="text" id="nombreRecoger" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                </div>
+            </div>
+        </div>
+
         <!-- Formulario de Domicilio -->
         <div id="deliveryForm" class="hidden bg-gray-800 rounded-lg p-6 mb-6">
             <h3 class="text-xl font-bold mb-4 text-yellow-400">Datos de Entrega</h3>
@@ -205,7 +222,13 @@ const htmlContent = `
                     <i class="fas fa-cheese mr-2"></i>Sincronizadas
                 </button>
                 <button onclick="showCategory('tortas')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
-                    <i class="fas fa-bread-slice mr-2"></i>Tortas y Burros
+                    <i class="fas fa-bread-slice mr-2"></i>Tortas
+                </button>
+                <button onclick="showCategory('burros')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                    <i class="fas fa-wrap mr-2"></i>Burros
+                </button>
+                <button onclick="showCategory('papas')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                    <i class="fas fa-french-fries mr-2"></i>Papas
                 </button>
                 <button onclick="showCategory('bebidas')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
                     <i class="fas fa-glass-water mr-2"></i>Bebidas

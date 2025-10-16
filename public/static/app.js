@@ -30,10 +30,12 @@ function setOrderType(type) {
         document.getElementById('btnDomicilio').classList.remove('bg-gray-700');
         document.getElementById('btnDomicilio').classList.add('bg-red-600');
         document.getElementById('deliveryForm').classList.remove('hidden');
+        document.getElementById('pickupForm').classList.add('hidden');
     } else {
         document.getElementById('btnRecoger').classList.remove('bg-gray-700');
         document.getElementById('btnRecoger').classList.add('bg-red-600');
         document.getElementById('deliveryForm').classList.add('hidden');
+        document.getElementById('pickupForm').classList.remove('hidden');
         deliveryCost = 0;
         updateCart();
     }
@@ -90,9 +92,9 @@ function openProductModal(product, category) {
     document.getElementById('productModalIngredients').textContent = product.ingredientes || '';
     document.getElementById('quantity').value = 1;
     
-    // Cargar ingredientes extra (no para bebidas)
+    // Cargar ingredientes extra (no para bebidas ni papas)
     const extraIngredientsDiv = document.getElementById('extraIngredients');
-    if (category !== 'bebidas') {
+    if (category !== 'bebidas' && category !== 'papas') {
         extraIngredientsDiv.innerHTML = '';
         menuData.ingredientesExtra.forEach(extra => {
             const div = document.createElement('div');
@@ -110,9 +112,9 @@ function openProductModal(product, category) {
         extraIngredientsDiv.parentElement.classList.add('hidden');
     }
     
-    // Cargar verduras (no para bebidas)
+    // Cargar verduras (no para bebidas ni papas)
     const vegetablesDiv = document.getElementById('vegetables');
-    if (category !== 'bebidas') {
+    if (category !== 'bebidas' && category !== 'papas') {
         vegetablesDiv.innerHTML = '';
         menuData.verduras.forEach(verdura => {
             const label = document.createElement('label');
@@ -128,9 +130,9 @@ function openProductModal(product, category) {
         vegetablesDiv.parentElement.classList.add('hidden');
     }
     
-    // Cargar aderezos (no para bebidas)
+    // Cargar aderezos (no para bebidas ni papas)
     const dressingsDiv = document.getElementById('dressings');
-    if (category !== 'bebidas') {
+    if (category !== 'bebidas' && category !== 'papas') {
         dressingsDiv.innerHTML = '';
         menuData.aderezos.forEach(aderezo => {
             const label = document.createElement('label');
@@ -316,7 +318,7 @@ function sendWhatsApp() {
         return;
     }
     
-    // Validar datos de domicilio si aplica
+    // Validar datos según tipo de pedido
     if (orderType === 'domicilio') {
         const nombre = document.getElementById('nombre').value;
         const domicilio = document.getElementById('domicilio').value;
@@ -328,6 +330,12 @@ function sendWhatsApp() {
             alert('Por favor completa todos los datos de entrega');
             return;
         }
+    } else if (orderType === 'recoger') {
+        const nombreRecoger = document.getElementById('nombreRecoger').value;
+        if (!nombreRecoger) {
+            alert('Por favor ingresa tu nombre para el pedido');
+            return;
+        }
     }
     
     // Construir mensaje
@@ -336,7 +344,7 @@ function sendWhatsApp() {
     // Tipo de pedido
     message += `📦 *Tipo:* ${orderType === 'domicilio' ? 'A Domicilio' : 'Pasar a Recoger'}\n\n`;
     
-    // Datos de entrega si es a domicilio
+    // Datos según tipo de pedido
     if (orderType === 'domicilio') {
         const nombre = document.getElementById('nombre').value;
         const domicilio = document.getElementById('domicilio').value;
@@ -348,6 +356,10 @@ function sendWhatsApp() {
         message += `• Domicilio: ${domicilio}\n`;
         message += `• Entre calles: ${entreCalles}\n`;
         message += `• Colonia: ${colonia}\n\n`;
+    } else if (orderType === 'recoger') {
+        const nombreRecoger = document.getElementById('nombreRecoger').value;
+        message += '🏪 *DATOS PARA RECOGER:*\n';
+        message += `• Nombre: ${nombreRecoger}\n\n`;
     }
     
     // Detalles del pedido
