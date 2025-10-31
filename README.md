@@ -12,21 +12,28 @@
 - **GitHub**: https://github.com/Raymondevil/desdeafuera
 
 ## Características Completadas ✅
-- ✅ Menú completo con todas las categorías (Hamburguesas, Hot Dogs, Sincronizadas, Tortas, Bebidas)
+- ✅ **Menú completo** con 7 categorías (Hamburguesas, Hot Dogs, Sincronizadas, Tortas, Burros, Papas, Bebidas)
+- ✅ **Diseño con colores originales** del menú físico (amarillo #FFCC00 y rojo #FF0000)
+- ✅ **Búsqueda rápida** de productos por nombre en tiempo real
+- ✅ **Sistema de caja (POS)** con búsqueda y gestión de ticket
+- ✅ **Modal de ingredientes extra** en la caja para hamburguesas, dogos, sincronizadas, tortas y burros
 - ✅ Sistema de carrito de compras con cantidades
 - ✅ Selección de tipo de pedido (Domicilio/Recoger)
+- ✅ **Nombre obligatorio** para pedidos de recoger
 - ✅ Formulario de datos de entrega para domicilio
-- ✅ Cálculo automático de costos de envío por zona
+- ✅ Cálculo automático de costos de envío por zona ($40 cercana, $80 alejada)
 - ✅ Personalización de productos con ingredientes extra, verduras y aderezos
-- ✅ Integración con WhatsApp para envío de pedidos
+- ✅ Integración con WhatsApp (+52 311 123 5595) para envío de pedidos
 - ✅ Diseño responsive y atractivo con TailwindCSS
-- ✅ Cálculo automático de totales y subtotales
+- ✅ **Dominio personalizado**: georgetepic.com
 
 ## Rutas y Funcionalidades
 
 ### Frontend
 - `/` - Página principal con el menú interactivo
+- `/caja` - **Sistema de caja (POS)** con búsqueda de productos y gestión de ticket
 - Modal de producto - Permite personalizar cada producto con extras
+- Modal de ingredientes extra (caja) - Pregunta por ingredientes adicionales al agregar productos
 - Carrito de compras - Visualización y gestión de pedidos
 - Formulario de entrega - Captura datos para domicilio
 
@@ -101,6 +108,12 @@ npm run deploy
 
 ## Última Actualización
 - **Fecha**: 2025-01-08
-- **Estado**: ✅ DESPLEGADO EN PRODUCCIÓN en Cloudflare Pages
-- **Nueva función**: Búsqueda instantánea de productos por nombre
-- **URL en vivo**: https://george-burger-menu.pages.dev
+- **Estado**: ✅ DESPLEGADO EN PRODUCCIÓN
+- **Nuevas funciones**: 
+  - Sistema de caja (POS) completo con búsqueda y modal de ingredientes extra
+  - Diseño con colores amarillo y rojo del menú original
+  - Búsqueda rápida en menú y caja
+  - Separación de categorías Burros y Papas
+- **URLs en vivo**: 
+  - https://georgetepic.com
+  - https://georgetepic.com/caja (Sistema de caja)
