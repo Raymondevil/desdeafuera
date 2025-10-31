@@ -1,6 +1,7 @@
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-workers'
+import { cajaHtmlContent } from './caja.html.tsx'
 
 const app = new Hono()
 
@@ -18,6 +19,11 @@ app.get('/api/menu', (c) => {
 // Main route
 app.get('/', (c) => {
   return c.html(htmlContent)
+})
+
+// Caja route
+app.get('/caja', (c) => {
+  return c.html(cajaHtmlContent)
 })
 
 // Menu data
@@ -129,17 +135,24 @@ const htmlContent = `
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
+<body class="bg-black text-gray-900 min-h-screen">
     <!-- Header -->
-    <header class="bg-red-700 shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-4">
+    <header class="shadow-lg sticky top-0 z-50" style="background-color: #FF0000;">
+        <div class="container mx-auto px-4 py-6">
             <div class="flex justify-between items-center">
                 <div class="flex items-center">
-                    <i class="fas fa-hamburger text-3xl text-yellow-400 mr-3"></i>
-                    <h1 class="text-2xl font-bold text-yellow-400">George Burger</h1>
+                    <i class="fas fa-hamburger text-3xl mr-3" style="color: #FFCC00;"></i>
+                    <div>
+                        <h1 class="text-3xl font-black text-white">Hamburguesas y Dogos "George"</h1>
+                        <p class="text-white text-sm font-semibold">Sincronizadas - Burritos - Dogos - Hamburguesas - Tortas</p>
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <button id="cartBtn" class="relative bg-yellow-400 text-red-700 px-4 py-2 rounded-lg font-bold hover:bg-yellow-300 transition">
+                <div class="flex items-center gap-3">
+                    <a href="/caja" class="px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-cash-register mr-2"></i>
+                        Caja
+                    </a>
+                    <button id="cartBtn" class="relative px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
                         <i class="fas fa-shopping-cart mr-2"></i>
                         <span id="cartCount">0</span>
                     </button>
@@ -150,54 +163,54 @@ const htmlContent = `
 
     <!-- Tipo de Pedido -->
     <div class="container mx-auto px-4 py-6">
-        <div class="bg-gray-800 rounded-lg p-6 mb-6">
-            <h2 class="text-xl font-bold mb-4 text-yellow-400">Tipo de Pedido</h2>
+        <div class="rounded-lg p-6 mb-6" style="background-color: #FFCC00;">
+            <h2 class="text-xl font-bold mb-4" style="color: #FF0000;">Tipo de Pedido</h2>
             <div class="grid grid-cols-2 gap-4">
-                <button onclick="setOrderType('recoger')" id="btnRecoger" class="order-type-btn bg-gray-700 hover:bg-red-600 p-4 rounded-lg transition">
-                    <i class="fas fa-store text-2xl mb-2"></i>
-                    <p>Pasar a Recoger</p>
+                <button onclick="setOrderType('recoger')" id="btnRecoger" class="order-type-btn bg-white p-4 rounded-lg transition border-4 border-transparent hover:border-red-600">
+                    <i class="fas fa-store text-2xl mb-2" style="color: #FF0000;"></i>
+                    <p class="font-bold text-black">Pasar a Recoger</p>
                 </button>
-                <button onclick="setOrderType('domicilio')" id="btnDomicilio" class="order-type-btn bg-gray-700 hover:bg-red-600 p-4 rounded-lg transition">
-                    <i class="fas fa-motorcycle text-2xl mb-2"></i>
-                    <p>A Domicilio</p>
+                <button onclick="setOrderType('domicilio')" id="btnDomicilio" class="order-type-btn bg-white p-4 rounded-lg transition border-4 border-transparent hover:border-red-600">
+                    <i class="fas fa-motorcycle text-2xl mb-2" style="color: #FF0000;"></i>
+                    <p class="font-bold text-black">A Domicilio</p>
                 </button>
             </div>
         </div>
 
         <!-- Formulario para Recoger -->
-        <div id="pickupForm" class="hidden bg-gray-800 rounded-lg p-6 mb-6">
-            <h3 class="text-xl font-bold mb-4 text-yellow-400">Datos para Recoger</h3>
+        <div id="pickupForm" class="hidden rounded-lg p-6 mb-6" style="background-color: #FFCC00;">
+            <h3 class="text-xl font-bold mb-4" style="color: #FF0000;">Datos para Recoger</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block mb-2">Nombre: <span class="text-red-400">*</span></label>
-                    <input type="text" id="nombreRecoger" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    <label class="block mb-2 font-bold text-black">Nombre: <span style="color: #FF0000;">*</span></label>
+                    <input type="text" id="nombreRecoger" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300" required>
                 </div>
             </div>
         </div>
 
         <!-- Formulario de Domicilio -->
-        <div id="deliveryForm" class="hidden bg-gray-800 rounded-lg p-6 mb-6">
-            <h3 class="text-xl font-bold mb-4 text-yellow-400">Datos de Entrega</h3>
+        <div id="deliveryForm" class="hidden rounded-lg p-6 mb-6" style="background-color: #FFCC00;">
+            <h3 class="text-xl font-bold mb-4" style="color: #FF0000;">Datos de Entrega</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block mb-2">Nombre:</label>
-                    <input type="text" id="nombre" class="w-full p-2 rounded bg-gray-700 text-white">
+                    <label class="block mb-2 font-bold text-black">Nombre:</label>
+                    <input type="text" id="nombre" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
                 </div>
                 <div>
-                    <label class="block mb-2">Domicilio:</label>
-                    <input type="text" id="domicilio" class="w-full p-2 rounded bg-gray-700 text-white">
+                    <label class="block mb-2 font-bold text-black">Domicilio:</label>
+                    <input type="text" id="domicilio" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
                 </div>
                 <div>
-                    <label class="block mb-2">Entre Calles:</label>
-                    <input type="text" id="entreCalles" class="w-full p-2 rounded bg-gray-700 text-white">
+                    <label class="block mb-2 font-bold text-black">Entre Calles:</label>
+                    <input type="text" id="entreCalles" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
                 </div>
                 <div>
-                    <label class="block mb-2">Colonia:</label>
-                    <input type="text" id="colonia" class="w-full p-2 rounded bg-gray-700 text-white">
+                    <label class="block mb-2 font-bold text-black">Colonia:</label>
+                    <input type="text" id="colonia" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
                 </div>
                 <div>
-                    <label class="block mb-2">Zona de Entrega:</label>
-                    <select id="zonaEntrega" class="w-full p-2 rounded bg-gray-700 text-white" onchange="updateDeliveryCost()">
+                    <label class="block mb-2 font-bold text-black">Zona de Entrega:</label>
+                    <select id="zonaEntrega" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300" onchange="updateDeliveryCost()">
                         <option value="0">Seleccionar zona...</option>
                         <option value="40">Zona Cercana (+$40)</option>
                         <option value="80">Zona Alejada (+$80)</option>
@@ -207,30 +220,54 @@ const htmlContent = `
         </div>
 
         <!-- Categorías del Menú -->
-        <div class="bg-gray-800 rounded-lg p-6">
-            <h2 class="text-2xl font-bold mb-6 text-yellow-400 text-center">Nuestro Menú</h2>
+        <div class="rounded-lg p-6" style="background-color: #FFCC00;">
+            <h2 class="text-3xl font-black mb-6 text-center" style="color: #FF0000;">Nuestro Menú</h2>
+            
+            <!-- Barra de búsqueda -->
+            <div class="mb-6 max-w-2xl mx-auto">
+                <div class="relative">
+                    <i class="fas fa-search absolute left-3 top-3" style="color: #FF0000;"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        placeholder="Buscar por nombre de producto..." 
+                        class="w-full pl-10 pr-4 py-3 bg-white text-black rounded-lg border-2 focus:outline-none focus:ring-2" 
+                        style="border-color: #FF0000;"
+                        onkeyup="searchProducts()"
+                    >
+                    <button 
+                        id="clearSearchBtn" 
+                        onclick="clearSearch()" 
+                        class="hidden absolute right-3 top-3 hover:opacity-75"
+                        style="color: #FF0000;"
+                    >
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="searchResults" class="mt-2 text-sm font-bold text-black"></div>
+            </div>
             
             <!-- Tabs de Categorías -->
-            <div class="flex flex-wrap justify-center gap-2 mb-6">
-                <button onclick="showCategory('hamburguesas')" class="category-tab bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500 transition">
+            <div id="categoryTabs" class="flex flex-wrap justify-center gap-2 mb-6">
+                <button onclick="showCategory('hamburguesas')" class="category-tab bg-white px-4 py-2 rounded-lg font-bold transition border-4" style="color: #FF0000; border-color: #FF0000;">
                     <i class="fas fa-hamburger mr-2"></i>Hamburguesas
                 </button>
-                <button onclick="showCategory('hotdogs')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                <button onclick="showCategory('hotdogs')" class="category-tab bg-white px-4 py-2 rounded-lg font-bold transition border-4 border-transparent hover:border-red-600" style="color: #000;">
                     <i class="fas fa-hotdog mr-2"></i>Hot Dogs
                 </button>
-                <button onclick="showCategory('sincronizadas')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                <button onclick="showCategory('sincronizadas')" class="category-tab bg-white px-4 py-2 rounded-lg font-bold transition border-4 border-transparent hover:border-red-600" style="color: #000;">
                     <i class="fas fa-cheese mr-2"></i>Sincronizadas
                 </button>
-                <button onclick="showCategory('tortas')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                <button onclick="showCategory('tortas')" class="category-tab bg-white px-4 py-2 rounded-lg font-bold transition border-4 border-transparent hover:border-red-600" style="color: #000;">
                     <i class="fas fa-bread-slice mr-2"></i>Tortas
                 </button>
-                <button onclick="showCategory('burros')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                <button onclick="showCategory('burros')" class="category-tab bg-white px-4 py-2 rounded-lg font-bold transition border-4 border-transparent hover:border-red-600" style="color: #000;">
                     <i class="fas fa-wrap mr-2"></i>Burros
                 </button>
-                <button onclick="showCategory('papas')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                <button onclick="showCategory('papas')" class="category-tab bg-white px-4 py-2 rounded-lg font-bold transition border-4 border-transparent hover:border-red-600" style="color: #000;">
                     <i class="fas fa-french-fries mr-2"></i>Papas
                 </button>
-                <button onclick="showCategory('bebidas')" class="category-tab bg-gray-700 px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                <button onclick="showCategory('bebidas')" class="category-tab bg-white px-4 py-2 rounded-lg font-bold transition border-4 border-transparent hover:border-red-600" style="color: #000;">
                     <i class="fas fa-glass-water mr-2"></i>Bebidas
                 </button>
             </div>
