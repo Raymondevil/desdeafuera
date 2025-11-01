@@ -16,6 +16,12 @@
 - ✅ **Diseño con colores originales** del menú físico (amarillo #FFCC00 y rojo #FF0000)
 - ✅ **Búsqueda rápida** de productos por nombre en tiempo real
 - ✅ **Sistema de caja (POS)** con búsqueda y gestión de ticket
+- ✅ **Sistema de inventario diario** con:
+  - Base de datos D1 (SQLite en Cloudflare)
+  - 18 productos predefinidos con cantidades iniciales
+  - Cálculo automático de diferencias y ventas
+  - Historial de ventas de los últimos 30 días
+  - Selector de fecha para consultar cualquier día
 - ✅ **Modal de ingredientes extra** en la caja para hamburguesas, dogos, sincronizadas, tortas y burros
 - ✅ Sistema de carrito de compras con cantidades
 - ✅ Selección de tipo de pedido (Domicilio/Recoger)
@@ -26,16 +32,26 @@
 - ✅ Integración con WhatsApp (+52 311 123 5595) para envío de pedidos
 - ✅ Diseño responsive y atractivo con TailwindCSS
 - ✅ **Dominio personalizado**: georgetepic.com
+- ✅ **Optimización de velocidad**: Carga rápida con lazy loading
+- ✅ **Manejo de errores**: Gestión de errores de red y base de datos
 
 ## Rutas y Funcionalidades
 
 ### Frontend
 - `/` - Página principal con el menú interactivo
 - `/caja` - **Sistema de caja (POS)** con búsqueda de productos y gestión de ticket
+- `/inventario` - **Sistema de inventario diario** con cálculo automático de ventas
 - Modal de producto - Permite personalizar cada producto con extras
 - Modal de ingredientes extra (caja) - Pregunta por ingredientes adicionales al agregar productos
 - Carrito de compras - Visualización y gestión de pedidos
 - Formulario de entrega - Captura datos para domicilio
+
+### API
+- `GET /api/menu` - Obtiene todos los datos del menú
+- `GET /api/inventario/productos` - Lista de productos del inventario
+- `GET /api/inventario/dia/:fecha` - Inventario de un día específico
+- `POST /api/inventario/guardar` - Guarda el inventario del día
+- `GET /api/inventario/historial` - Historial de ventas de los últimos 30 días
 
 ### API
 - `GET /api/menu` - Obtiene todos los datos del menú
@@ -108,12 +124,17 @@ npm run deploy
 
 ## Última Actualización
 - **Fecha**: 2025-01-08
-- **Estado**: ✅ DESPLEGADO EN PRODUCCIÓN
+- **Estado**: ✅ DESPLEGADO EN PRODUCCIÓN CON BASE DE DATOS
 - **Nuevas funciones**: 
+  - **Sistema de inventario diario** con base de datos D1
+  - Cálculo automático de ventas por día
+  - Historial de ventas de 30 días
+  - 18 productos de inventario predefinidos
   - Sistema de caja (POS) completo con búsqueda y modal de ingredientes extra
   - Diseño con colores amarillo y rojo del menú original
   - Búsqueda rápida en menú y caja
   - Separación de categorías Burros y Papas
 - **URLs en vivo**: 
-  - https://georgetepic.com
+  - https://georgetepic.com (Menú principal)
   - https://georgetepic.com/caja (Sistema de caja)
+  - https://georgetepic.com/inventario (Inventario diario)
