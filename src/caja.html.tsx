@@ -20,10 +20,14 @@ export const cajaHtmlContent = `
                         <p class="text-white text-sm font-semibold">Sistema de Cobro</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="/" class="px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
-                        <i class="fas fa-home mr-2"></i>
+                <div class="flex items-center gap-2">
+                    <a href="/" class="px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-home mr-1"></i>
                         Menú
+                    </a>
+                    <a href="/inventario" class="px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-clipboard-list mr-1"></i>
+                        Inventario
                     </a>
                 </div>
             </div>

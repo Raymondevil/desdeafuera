@@ -5,6 +5,13 @@
   "pages_build_output_dir": "./dist",
   "compatibility_flags": [
     "nodejs_compat"
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "george-burger-db",
+      "database_id": "7db5312c-af80-4faf-ade8-4edcf9ef2e51"
+    }
   ]
   // "vars": {
   //   "MY_VAR": "my-variable"

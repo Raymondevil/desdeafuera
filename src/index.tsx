@@ -2,8 +2,13 @@ import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { serveStatic } from 'hono/cloudflare-workers'
 import { cajaHtmlContent } from './caja.html.tsx'
+import { inventarioHtmlContent } from './inventario.html.tsx'
 
-const app = new Hono()
+type Bindings = {
+  DB: D1Database;
+}
+
+const app = new Hono<{ Bindings: Bindings }>()
 
 // Enable CORS
 app.use('/api/*', cors())
@@ -24,6 +29,80 @@ app.get('/', (c) => {
 // Caja route
 app.get('/caja', (c) => {
   return c.html(cajaHtmlContent)
+})
+
+// Inventario route
+app.get('/inventario', (c) => {
+  return c.html(inventarioHtmlContent)
+})
+
+// API Inventario - Obtener productos
+app.get('/api/inventario/productos', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(
+      'SELECT * FROM productos_inventario ORDER BY nombre'
+    ).all();
+    return c.json(results);
+  } catch (error) {
+    return c.json({ error: 'Error al obtener productos' }, 500);
+  }
+})
+
+// API Inventario - Obtener inventario del día
+app.get('/api/inventario/dia/:fecha', async (c) => {
+  try {
+    const fecha = c.req.param('fecha');
+    const { results } = await c.env.DB.prepare(
+      'SELECT * FROM inventario_diario WHERE fecha = ?'
+    ).bind(fecha).all();
+    return c.json(results);
+  } catch (error) {
+    return c.json({ error: 'Error al obtener inventario' }, 500);
+  }
+})
+
+// API Inventario - Guardar inventario
+app.post('/api/inventario/guardar', async (c) => {
+  try {
+    const { inventario } = await c.req.json();
+    
+    // Preparar statements
+    const stmt = c.env.DB.prepare(`
+      INSERT OR REPLACE INTO inventario_diario 
+      (producto_id, fecha, cantidad_inicial, cantidad_final, precio_unitario)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    
+    // Ejecutar en batch
+    const batch = inventario.map((item: any) => 
+      stmt.bind(item.producto_id, item.fecha, item.cantidad_inicial, item.cantidad_final, item.precio_unitario)
+    );
+    
+    await c.env.DB.batch(batch);
+    
+    return c.json({ success: true });
+  } catch (error) {
+    console.error('Error al guardar inventario:', error);
+    return c.json({ error: 'Error al guardar inventario' }, 500);
+  }
+})
+
+// API Inventario - Obtener historial
+app.get('/api/inventario/historial', async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(`
+      SELECT 
+        fecha,
+        SUM((cantidad_inicial - cantidad_final) * precio_unitario) as total
+      FROM inventario_diario
+      GROUP BY fecha
+      ORDER BY fecha DESC
+      LIMIT 30
+    `).all();
+    return c.json(results);
+  } catch (error) {
+    return c.json({ error: 'Error al obtener historial' }, 500);
+  }
 })
 
 // Menu data
@@ -63,7 +142,7 @@ const menuData = {
   hotdogs: [
     { nombre: "Dogo de Pavo", ingredientes: "Salchicha de Pavo", precio: 50 },
     { nombre: "Grosero", ingredientes: "Salchicha para Asar+Q.Asadero+Tocino Rebanado", precio: 60 },
-    { nombre: "Asadero", ingredientes: "Salchicha+Q.Asadero", precio: 73 },
+    { nombre: "Asadero", ingredientes: "Salchicha+Q.Asadero", precio: 63 },
     { nombre: "Big Grosero", ingredientes: "Grosero+Carnes Frías", precio: 76 },
     { nombre: "Choriqueso", ingredientes: "Salchicha+Chorizo+Q.Asadero", precio: 76 },
     { nombre: "Champiqueso", ingredientes: "Salchicha+Champiñones+Q.Asadero", precio: 63 },
@@ -147,13 +226,17 @@ const htmlContent = `
                         <p class="text-white text-sm font-semibold">Sincronizadas - Burritos - Dogos - Hamburguesas - Tortas</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <a href="/caja" class="px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
-                        <i class="fas fa-cash-register mr-2"></i>
+                <div class="flex items-center gap-2">
+                    <a href="/inventario" class="px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-clipboard-list mr-1"></i>
+                        Inventario
+                    </a>
+                    <a href="/caja" class="px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-cash-register mr-1"></i>
                         Caja
                     </a>
-                    <button id="cartBtn" class="relative px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
-                        <i class="fas fa-shopping-cart mr-2"></i>
+                    <button id="cartBtn" class="relative px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-shopping-cart mr-1"></i>
                         <span id="cartCount">0</span>
                     </button>
                 </div>
