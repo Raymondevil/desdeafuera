@@ -26,13 +26,54 @@ app.get('/', (c) => {
   return c.html(htmlContent)
 })
 
-// Caja route
-app.get('/caja', (c) => {
+// Middleware de autenticación simple
+const AUTH_TOKEN = 'george2024admin';
+
+const checkAuth = async (c: any, next: any) => {
+  const token = c.req.query('token');
+  if (token === AUTH_TOKEN) {
+    // Guardar en cookie por 24 horas
+    c.header('Set-Cookie', `auth_token=${AUTH_TOKEN}; Path=/; Max-Age=86400; HttpOnly; SameSite=Strict`);
+    await next();
+  } else {
+    // Verificar cookie
+    const cookies = c.req.header('Cookie') || '';
+    if (cookies.includes(`auth_token=${AUTH_TOKEN}`)) {
+      await next();
+    } else {
+      return c.html(`
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Acceso Restringido - George Burger</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body class="bg-black min-h-screen flex items-center justify-center p-4">
+            <div class="rounded-lg p-8 max-w-md w-full text-center" style="background-color: #FFCC00;">
+                <i class="fas fa-lock text-6xl mb-4" style="color: #FF0000;"></i>
+                <h1 class="text-2xl font-black mb-4" style="color: #FF0000;">Acceso Restringido</h1>
+                <p class="font-bold text-black mb-6">Esta página requiere autenticación.</p>
+                <a href="/" class="inline-block px-6 py-3 rounded-lg font-bold text-white transition hover:opacity-90" style="background-color: #FF0000;">
+                    <i class="fas fa-home mr-2"></i>Volver al Menú
+                </a>
+            </div>
+            <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
+        </body>
+        </html>
+      `);
+    }
+  }
+};
+
+// Caja route (protegida)
+app.get('/caja', checkAuth, (c) => {
   return c.html(cajaHtmlContent)
 })
 
-// Inventario route
-app.get('/inventario', (c) => {
+// Inventario route (protegida)
+app.get('/inventario', checkAuth, (c) => {
   return c.html(inventarioHtmlContent)
 })
 
@@ -227,16 +268,8 @@ const htmlContent = `
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <a href="/inventario" class="px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
-                        <i class="fas fa-clipboard-list mr-1"></i>
-                        Inventario
-                    </a>
-                    <a href="/caja" class="px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
-                        <i class="fas fa-cash-register mr-1"></i>
-                        Caja
-                    </a>
-                    <button id="cartBtn" class="relative px-3 py-2 rounded-lg font-bold transition text-sm" style="background-color: #FFCC00; color: #FF0000;">
-                        <i class="fas fa-shopping-cart mr-1"></i>
+                    <button id="cartBtn" class="relative px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-shopping-cart mr-2"></i>
                         <span id="cartCount">0</span>
                     </button>
                 </div>
@@ -396,13 +429,13 @@ const htmlContent = `
 
     <!-- Modal para agregar producto -->
     <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-lg max-w-md w-full p-6">
-            <h3 class="text-xl font-bold text-yellow-400 mb-4" id="productModalTitle"></h3>
-            <p class="text-gray-300 mb-4" id="productModalIngredients"></p>
+        <div class="rounded-lg max-w-md w-full p-6" style="background-color: #FFCC00;">
+            <h3 class="text-xl font-black mb-4" style="color: #FF0000;" id="productModalTitle"></h3>
+            <p class="text-black font-bold mb-4" id="productModalIngredients"></p>
             
             <!-- Ingredientes Extra -->
             <div class="mb-4">
-                <h4 class="font-bold mb-2">Ingredientes Extra (opcional):</h4>
+                <h4 class="font-bold mb-2 text-black">Ingredientes Extra (opcional):</h4>
                 <div class="max-h-40 overflow-y-auto" id="extraIngredients">
                     <!-- Se llenará dinámicamente -->
                 </div>
@@ -410,7 +443,7 @@ const htmlContent = `
 
             <!-- Verduras -->
             <div class="mb-4">
-                <h4 class="font-bold mb-2">Verduras:</h4>
+                <h4 class="font-bold mb-2 text-black">Verduras:</h4>
                 <div class="flex flex-wrap gap-2" id="vegetables">
                     <!-- Se llenará dinámicamente -->
                 </div>
@@ -418,7 +451,7 @@ const htmlContent = `
 
             <!-- Aderezos -->
             <div class="mb-4">
-                <h4 class="font-bold mb-2">Aderezos:</h4>
+                <h4 class="font-bold mb-2 text-black">Aderezos:</h4>
                 <div class="flex flex-wrap gap-2" id="dressings">
                     <!-- Se llenará dinámicamente -->
                 </div>
@@ -426,28 +459,28 @@ const htmlContent = `
 
             <!-- Cantidad -->
             <div class="mb-4">
-                <label class="block mb-2">Cantidad:</label>
+                <label class="block mb-2 font-bold text-black">Cantidad:</label>
                 <div class="flex items-center gap-4">
-                    <button onclick="changeQuantity(-1)" class="bg-red-600 text-white w-10 h-10 rounded-lg hover:bg-red-500">
+                    <button onclick="changeQuantity(-1)" class="text-white w-10 h-10 rounded-lg font-bold transition hover:opacity-90" style="background-color: #FF0000;">
                         <i class="fas fa-minus"></i>
                     </button>
-                    <input type="number" id="quantity" value="1" min="1" class="w-16 text-center bg-gray-700 text-white rounded p-2">
-                    <button onclick="changeQuantity(1)" class="bg-green-600 text-white w-10 h-10 rounded-lg hover:bg-green-500">
+                    <input type="number" id="quantity" value="1" min="1" class="w-16 text-center bg-white text-black font-bold rounded p-2 border-2" style="border-color: #FF0000;">
+                    <button onclick="changeQuantity(1)" class="text-white w-10 h-10 rounded-lg font-bold transition hover:opacity-90" style="background-color: #FF0000;">
                         <i class="fas fa-plus"></i>
                     </button>
                 </div>
             </div>
 
             <div class="flex justify-between items-center mb-4">
-                <span class="text-lg">Precio Total:</span>
-                <span class="text-2xl font-bold text-yellow-400" id="productModalPrice"></span>
+                <span class="text-lg font-bold text-black">Precio Total:</span>
+                <span class="text-2xl font-black" style="color: #FF0000;" id="productModalPrice"></span>
             </div>
 
             <div class="flex gap-4">
-                <button onclick="closeProductModal()" class="flex-1 bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600">
+                <button onclick="closeProductModal()" class="flex-1 bg-white py-2 rounded-lg font-bold transition hover:opacity-90" style="color: #FF0000;">
                     Cancelar
                 </button>
-                <button onclick="addToCart()" class="flex-1 bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-500">
+                <button onclick="addToCart()" class="flex-1 text-white py-2 rounded-lg font-bold transition hover:opacity-90" style="background-color: #FF0000;">
                     Agregar al Carrito
                 </button>
             </div>
