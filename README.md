@@ -39,7 +39,7 @@
 
 ### Frontend
 - `/` - Página principal con el menú interactivo
-- `/caja` - **Sistema de caja (POS)** con búsqueda de productos y gestión de ticket
+- `/cobro` - **Sistema de cobro (POS)** con búsqueda de productos y gestión de ticket
 - `/inventario` - **Sistema de inventario diario** con cálculo automático de ventas
 - Modal de producto - Permite personalizar cada producto con extras
 - Modal de ingredientes extra (caja) - Pregunta por ingredientes adicionales al agregar productos
@@ -125,16 +125,19 @@ npm run deploy
 ## Última Actualización
 - **Fecha**: 2025-01-08
 - **Estado**: ✅ DESPLEGADO EN PRODUCCIÓN CON BASE DE DATOS
-- **Nuevas funciones**: 
+- **Últimos cambios**: 
+  - **Ruta actualizada**: /caja → /cobro
+  - **Colores personalizados**: Gray → #efefef (gris claro), Green → #0033FF (azul)
   - **Sistema de inventario diario** con base de datos D1
   - Cálculo automático de ventas por día
   - Historial de ventas de 30 días
   - 18 productos de inventario predefinidos
-  - Sistema de caja (POS) completo con búsqueda y modal de ingredientes extra
-  - Diseño con colores amarillo y rojo del menú original
-  - Búsqueda rápida en menú y caja
+  - Sistema de cobro (POS) completo con búsqueda y modal de ingredientes extra
+  - Diseño con colores amarillo (#FFCC00) y rojo (#FF0000) del menú original
+  - Búsqueda rápida en menú y cobro
   - Separación de categorías Burros y Papas
+  - Protección con autenticación para rutas administrativas
 - **URLs en vivo**: 
-  - https://georgetepic.com (Menú principal)
-  - https://georgetepic.com/caja (Sistema de caja)
-  - https://georgetepic.com/inventario (Inventario diario)
+  - https://georgetepic.com (Menú principal - Público)
+  - https://georgetepic.com/cobro (Sistema de cobro - Protegido)
+  - https://georgetepic.com/inventario (Inventario diario - Protegido)
