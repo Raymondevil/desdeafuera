@@ -23,16 +23,16 @@ function setOrderType(type) {
     // Actualizar botones
     document.querySelectorAll('.order-type-btn').forEach(btn => {
         btn.classList.remove('bg-red-600');
-        btn.classList.add('bg-gray-700');
+        btn.classList.add('bg-#efefef');
     });
     
     if (type === 'domicilio') {
-        document.getElementById('btnDomicilio').classList.remove('bg-gray-700');
+        document.getElementById('btnDomicilio').classList.remove('bg-#efefef');
         document.getElementById('btnDomicilio').classList.add('bg-red-600');
         document.getElementById('deliveryForm').classList.remove('hidden');
         document.getElementById('pickupForm').classList.add('hidden');
     } else {
-        document.getElementById('btnRecoger').classList.remove('bg-gray-700');
+        document.getElementById('btnRecoger').classList.remove('bg-#efefef');
         document.getElementById('btnRecoger').classList.add('bg-red-600');
         document.getElementById('deliveryForm').classList.add('hidden');
         document.getElementById('pickupForm').classList.remove('hidden');
@@ -53,9 +53,9 @@ function showCategory(category) {
     // Actualizar tabs
     document.querySelectorAll('.category-tab').forEach(tab => {
         tab.classList.remove('bg-red-600');
-        tab.classList.add('bg-gray-700');
+        tab.classList.add('bg-#efefef');
     });
-    event.target.classList.remove('bg-gray-700');
+    event.target.classList.remove('bg-#efefef');
     event.target.classList.add('bg-red-600');
 
     // Mostrar productos
@@ -66,15 +66,15 @@ function showCategory(category) {
     
     items.forEach(item => {
         const card = document.createElement('div');
-        card.className = 'bg-gray-700 rounded-lg p-4 hover:bg-gray-600 transition cursor-pointer';
+        card.className = 'bg-#efefef rounded-lg p-4 hover:bg-#efefef transition cursor-pointer';
         card.onclick = () => openProductModal(item, category);
         
         card.innerHTML = `
             <div class="flex justify-between items-start mb-2">
                 <h3 class="font-bold text-yellow-400">${item.nombre}</h3>
-                <span class="text-xl font-bold text-green-400">$${item.precio}</span>
+                <span class="text-xl font-bold text-#0033FF">$${item.precio}</span>
             </div>
-            <p class="text-sm text-gray-300">${item.ingredientes || ''}</p>
+            <p class="text-sm text-#efefef">${item.ingredientes || ''}</p>
             <button class="mt-3 w-full bg-red-600 text-white py-2 rounded hover:bg-red-500 transition">
                 <i class="fas fa-plus-circle mr-2"></i>Agregar
             </button>
@@ -103,7 +103,7 @@ function openProductModal(product, category) {
                 <input type="checkbox" id="extra_${extra.nombre}" value="${extra.precio}" 
                        onchange="updateProductPrice()" class="mr-2">
                 <label for="extra_${extra.nombre}" class="flex-1">${extra.nombre}</label>
-                <span class="text-green-400">+$${extra.precio}</span>
+                <span class="text-#0033FF">+$${extra.precio}</span>
             `;
             extraIngredientsDiv.appendChild(div);
         });
@@ -118,7 +118,7 @@ function openProductModal(product, category) {
         vegetablesDiv.innerHTML = '';
         menuData.verduras.forEach(verdura => {
             const label = document.createElement('label');
-            label.className = 'flex items-center bg-gray-700 px-3 py-1 rounded cursor-pointer hover:bg-gray-600';
+            label.className = 'flex items-center bg-#efefef px-3 py-1 rounded cursor-pointer hover:bg-#efefef';
             label.innerHTML = `
                 <input type="checkbox" value="${verdura}" class="mr-2">
                 <span>${verdura}</span>
@@ -136,7 +136,7 @@ function openProductModal(product, category) {
         dressingsDiv.innerHTML = '';
         menuData.aderezos.forEach(aderezo => {
             const label = document.createElement('label');
-            label.className = 'flex items-center bg-gray-700 px-3 py-1 rounded cursor-pointer hover:bg-gray-600';
+            label.className = 'flex items-center bg-#efefef px-3 py-1 rounded cursor-pointer hover:bg-#efefef';
             label.innerHTML = `
                 <input type="checkbox" value="${aderezo}" class="mr-2">
                 <span>${aderezo}</span>
@@ -237,21 +237,21 @@ function updateCart() {
     cartItemsDiv.innerHTML = '';
     
     if (cart.length === 0) {
-        cartItemsDiv.innerHTML = '<p class="text-gray-400">Tu carrito está vacío</p>';
+        cartItemsDiv.innerHTML = '<p class="text-#efefef">Tu carrito está vacío</p>';
     } else {
         cart.forEach((item, index) => {
             const itemDiv = document.createElement('div');
-            itemDiv.className = 'bg-gray-700 rounded-lg p-4 mb-4';
+            itemDiv.className = 'bg-#efefef rounded-lg p-4 mb-4';
             
             let details = '';
             if (item.extras.length > 0) {
-                details += `<p class="text-sm text-gray-400">Extras: ${item.extras.join(', ')}</p>`;
+                details += `<p class="text-sm text-#efefef">Extras: ${item.extras.join(', ')}</p>`;
             }
             if (item.verduras.length > 0) {
-                details += `<p class="text-sm text-gray-400">Verduras: ${item.verduras.join(', ')}</p>`;
+                details += `<p class="text-sm text-#efefef">Verduras: ${item.verduras.join(', ')}</p>`;
             }
             if (item.aderezos.length > 0) {
-                details += `<p class="text-sm text-gray-400">Aderezos: ${item.aderezos.join(', ')}</p>`;
+                details += `<p class="text-sm text-#efefef">Aderezos: ${item.aderezos.join(', ')}</p>`;
             }
             
             itemDiv.innerHTML = `
@@ -262,7 +262,7 @@ function updateCart() {
                         <p class="text-sm">Cantidad: ${item.cantidad} | Precio unitario: $${item.precio}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-lg font-bold text-green-400">$${item.subtotal}</p>
+                        <p class="text-lg font-bold text-#0033FF">$${item.subtotal}</p>
                         <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-300 mt-2">
                             <i class="fas fa-trash"></i>
                         </button>
@@ -409,7 +409,7 @@ function sendWhatsApp() {
 // Mostrar notificación
 function showNotification(message) {
     const notification = document.createElement('div');
-    notification.className = 'fixed top-20 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse';
+    notification.className = 'fixed top-20 right-4 bg-#0033FF text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-pulse';
     notification.textContent = message;
     document.body.appendChild(notification);
     

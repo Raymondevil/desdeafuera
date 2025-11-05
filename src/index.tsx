@@ -67,9 +67,15 @@ const checkAuth = async (c: any, next: any) => {
   }
 };
 
-// Caja route (protegida)
-app.get('/caja', checkAuth, (c) => {
+// Cobro route (protegida)
+app.get('/cobro', checkAuth, (c) => {
   return c.html(cajaHtmlContent)
+})
+
+// Redirect /caja to /cobro for backwards compatibility
+app.get('/caja', (c) => {
+  const token = c.req.query('token');
+  return c.redirect(token ? `/cobro?token=${token}` : '/cobro');
 })
 
 // Inventario route (protegida)
@@ -255,7 +261,7 @@ const htmlContent = `
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-black text-gray-900 min-h-screen">
+<body class="bg-black text-#efefef min-h-screen">
     <!-- Header -->
     <header class="shadow-lg sticky top-0 z-50" style="background-color: #FF0000;">
         <div class="container mx-auto px-4 py-6">
@@ -299,7 +305,7 @@ const htmlContent = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block mb-2 font-bold text-black">Nombre: <span style="color: #FF0000;">*</span></label>
-                    <input type="text" id="nombreRecoger" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300" required>
+                    <input type="text" id="nombreRecoger" class="w-full p-2 rounded bg-white text-black border-2 border-#efefef" required>
                 </div>
             </div>
         </div>
@@ -310,23 +316,23 @@ const htmlContent = `
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block mb-2 font-bold text-black">Nombre:</label>
-                    <input type="text" id="nombre" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
+                    <input type="text" id="nombre" class="w-full p-2 rounded bg-white text-black border-2 border-#efefef">
                 </div>
                 <div>
                     <label class="block mb-2 font-bold text-black">Domicilio:</label>
-                    <input type="text" id="domicilio" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
+                    <input type="text" id="domicilio" class="w-full p-2 rounded bg-white text-black border-2 border-#efefef">
                 </div>
                 <div>
                     <label class="block mb-2 font-bold text-black">Entre Calles:</label>
-                    <input type="text" id="entreCalles" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
+                    <input type="text" id="entreCalles" class="w-full p-2 rounded bg-white text-black border-2 border-#efefef">
                 </div>
                 <div>
                     <label class="block mb-2 font-bold text-black">Colonia:</label>
-                    <input type="text" id="colonia" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300">
+                    <input type="text" id="colonia" class="w-full p-2 rounded bg-white text-black border-2 border-#efefef">
                 </div>
                 <div>
                     <label class="block mb-2 font-bold text-black">Zona de Entrega:</label>
-                    <select id="zonaEntrega" class="w-full p-2 rounded bg-white text-black border-2 border-gray-300" onchange="updateDeliveryCost()">
+                    <select id="zonaEntrega" class="w-full p-2 rounded bg-white text-black border-2 border-#efefef" onchange="updateDeliveryCost()">
                         <option value="0">Seleccionar zona...</option>
                         <option value="40">Zona Cercana (+$40)</option>
                         <option value="80">Zona Alejada (+$80)</option>
@@ -397,17 +403,17 @@ const htmlContent = `
 
     <!-- Modal del Carrito -->
     <div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto p-6">
+        <div class="bg-#efefef rounded-lg max-w-2xl w-full max-h-screen overflow-y-auto p-6">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold text-yellow-400">Tu Pedido</h2>
-                <button onclick="closeCart()" class="text-gray-400 hover:text-white">
+                <button onclick="closeCart()" class="text-#efefef hover:text-white">
                     <i class="fas fa-times text-2xl"></i>
                 </button>
             </div>
             <div id="cartItems" class="mb-4">
                 <!-- Items del carrito -->
             </div>
-            <div class="border-t border-gray-700 pt-4">
+            <div class="border-t border-#efefef pt-4">
                 <div class="flex justify-between mb-2">
                     <span>Subtotal:</span>
                     <span id="subtotal">$0</span>
@@ -420,7 +426,7 @@ const htmlContent = `
                     <span>Total:</span>
                     <span id="total">$0</span>
                 </div>
-                <button onclick="sendWhatsApp()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold mt-4 hover:bg-green-700 transition">
+                <button onclick="sendWhatsApp()" class="w-full bg-#0033FF text-white py-3 rounded-lg font-bold mt-4 hover:bg-#0033FF transition">
                     <i class="fab fa-whatsapp mr-2"></i>Enviar Pedido por WhatsApp
                 </button>
             </div>

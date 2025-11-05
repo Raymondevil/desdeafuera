@@ -4,11 +4,11 @@ export const cajaHtmlContent = `
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caja - George Burger</title>
+    <title>Cobro - George Burger</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-black text-gray-900 min-h-screen">
+<body class="bg-black text-#efefef min-h-screen">
     <!-- Header -->
     <header class="shadow-lg sticky top-0 z-50" style="background-color: #FF0000;">
         <div class="container mx-auto px-4 py-6">
@@ -16,7 +16,7 @@ export const cajaHtmlContent = `
                 <div class="flex items-center">
                     <i class="fas fa-cash-register text-3xl mr-3" style="color: #FFCC00;"></i>
                     <div>
-                        <h1 class="text-3xl font-black text-white">Caja - George Burger</h1>
+                        <h1 class="text-3xl font-black text-white">Cobro - George Burger</h1>
                         <p class="text-white text-sm font-semibold">Sistema de Cobro</p>
                     </div>
                 </div>
@@ -66,7 +66,7 @@ export const cajaHtmlContent = `
                     <h2 class="text-2xl font-black mb-4 text-center" style="color: #FF0000;">Ticket</h2>
                     
                     <div id="ticketItems" class="mb-4 max-h-96 overflow-y-auto">
-                        <p class="text-center text-gray-600 font-bold">No hay productos</p>
+                        <p class="text-center text-#efefef font-bold">No hay productos</p>
                     </div>
 
                     <div class="border-t-2 pt-4" style="border-color: #FF0000;">

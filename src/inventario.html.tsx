@@ -8,7 +8,7 @@ export const inventarioHtmlContent = `
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-black text-gray-900 min-h-screen">
+<body class="bg-black text-#efefef min-h-screen">
     <!-- Header -->
     <header class="shadow-lg sticky top-0 z-50" style="background-color: #FF0000;">
         <div class="container mx-auto px-4 py-6">
@@ -24,8 +24,8 @@ export const inventarioHtmlContent = `
                     <a href="/" class="px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
                         <i class="fas fa-home mr-2"></i>Menú
                     </a>
-                    <a href="/caja" class="px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
-                        <i class="fas fa-cash-register mr-2"></i>Caja
+                    <a href="/cobro" class="px-4 py-2 rounded-lg font-bold transition" style="background-color: #FFCC00; color: #FF0000;">
+                        <i class="fas fa-cash-register mr-2"></i>Cobro
                     </a>
                 </div>
             </div>

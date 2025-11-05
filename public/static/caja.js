@@ -215,7 +215,7 @@ function renderTicket() {
     const ticketItems = document.getElementById('ticketItems');
     
     if (ticket.length === 0) {
-        ticketItems.innerHTML = '<p class="text-center text-gray-600 font-bold">No hay productos</p>';
+        ticketItems.innerHTML = '<p class="text-center text-#efefef font-bold">No hay productos</p>';
         document.getElementById('totalCaja').textContent = '$0';
         return;
     }
@@ -231,7 +231,7 @@ function renderTicket() {
         
         let extrasHtml = '';
         if (item.extras && item.extras.length > 0) {
-            extrasHtml = `<div class="text-xs text-gray-600 mt-1">+ ${item.extras.join(', ')}</div>`;
+            extrasHtml = `<div class="text-xs text-#efefef mt-1">+ ${item.extras.join(', ')}</div>`;
         }
         
         itemDiv.innerHTML = `

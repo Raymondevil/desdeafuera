@@ -76,10 +76,10 @@ function renderizarTabla() {
         const venta = diferencia * producto.precio_unitario;
         
         const tr = document.createElement('tr');
-        tr.className = 'border-b hover:bg-gray-50';
+        tr.className = 'border-b hover:bg-#efefef';
         tr.innerHTML = `
             <td class="p-3 font-bold text-black">${producto.nombre}</td>
-            <td class="p-3 text-center text-gray-700">${producto.unidad}</td>
+            <td class="p-3 text-center text-#efefef">${producto.unidad}</td>
             <td class="p-3 text-center font-bold" style="color: #FF0000;">$${producto.precio_unitario}</td>
             <td class="p-3 text-center">
                 <input 
@@ -101,7 +101,7 @@ function renderizarTabla() {
                     onchange="actualizarCantidad(${producto.id}, 'final', this.value)"
                 >
             </td>
-            <td class="p-3 text-center font-bold ${diferencia > 0 ? 'text-green-600' : 'text-gray-500'}">${diferencia}</td>
+            <td class="p-3 text-center font-bold ${diferencia > 0 ? 'text-#0033FF' : 'text-#efefef'}">${diferencia}</td>
             <td class="p-3 text-center font-black" style="color: #FF0000;">$${venta.toFixed(2)}</td>
         `;
         tbody.appendChild(tr);
