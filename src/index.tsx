@@ -1,47 +1,47 @@
-import { Hono } from 'hono'
-import { cors } from 'hono/cors'
-import { serveStatic } from 'hono/cloudflare-workers'
-import { cajaHtmlContent } from './caja.html.tsx'
-import { inventarioHtmlContent } from './inventario.html.tsx'
+import {Hono} from 'hono'
+import {cors} from 'hono/cors'
+import {serveStatic} from 'hono/cloudflare-workers'
+import {cajaHtmlContent} from './caja.html.tsx'
+import {inventarioHtmlContent} from './inventario.html.tsx'
 
 type Bindings = {
-  DB: D1Database;
+	DB: D1Database;
 }
 
-const app = new Hono<{ Bindings: Bindings }>()
+const app = new Hono<{Bindings: Bindings}>()
 
 // Enable CORS
 app.use('/api/*', cors())
 
 // Serve static files
-app.use('/static/*', serveStatic({ root: './public' }))
+app.use('/static/*', serveStatic({root: './public'}))
 
 // API route to get menu data
 app.get('/api/menu', (c) => {
-  return c.json(menuData)
+	return c.json(menuData)
 })
 
 // Main route
 app.get('/', (c) => {
-  return c.html(htmlContent)
+	return c.html(htmlContent)
 })
 
 // Middleware de autenticación simple
 const AUTH_TOKEN = 'george2024admin';
 
 const checkAuth = async (c: any, next: any) => {
-  const token = c.req.query('token');
-  if (token === AUTH_TOKEN) {
-    // Guardar en cookie por 24 horas
-    c.header('Set-Cookie', `auth_token=${AUTH_TOKEN}; Path=/; Max-Age=86400; HttpOnly; SameSite=Strict`);
-    await next();
-  } else {
-    // Verificar cookie
-    const cookies = c.req.header('Cookie') || '';
-    if (cookies.includes(`auth_token=${AUTH_TOKEN}`)) {
-      await next();
-    } else {
-      return c.html(`
+	const token = c.req.query('token');
+	if (token === AUTH_TOKEN) {
+		// Guardar en cookie por 24 horas
+		c.header('Set-Cookie', `auth_token=${AUTH_TOKEN}; Path=/; Max-Age=86400; HttpOnly; SameSite=Strict`);
+		await next();
+	} else {
+		// Verificar cookie
+		const cookies = c.req.header('Cookie') || '';
+		if (cookies.includes(`auth_token=${AUTH_TOKEN}`)) {
+			await next();
+		} else {
+			return c.html(`
         <!DOCTYPE html>
         <html lang="es">
         <head>
@@ -63,81 +63,81 @@ const checkAuth = async (c: any, next: any) => {
         </body>
         </html>
       `);
-    }
-  }
+		}
+	}
 };
 
 // Cobro route (protegida)
 app.get('/cobro', checkAuth, (c) => {
-  return c.html(cajaHtmlContent)
+	return c.html(cajaHtmlContent)
 })
 
 // Redirect /caja to /cobro for backwards compatibility
 app.get('/caja', (c) => {
-  const token = c.req.query('token');
-  return c.redirect(token ? `/cobro?token=${token}` : '/cobro');
+	const token = c.req.query('token');
+	return c.redirect(token ? `/cobro?token=${token}` : '/cobro');
 })
 
 // Inventario route (protegida)
 app.get('/inventario', checkAuth, (c) => {
-  return c.html(inventarioHtmlContent)
+	return c.html(inventarioHtmlContent)
 })
 
 // API Inventario - Obtener productos
 app.get('/api/inventario/productos', async (c) => {
-  try {
-    const { results } = await c.env.DB.prepare(
-      'SELECT * FROM productos_inventario ORDER BY nombre'
-    ).all();
-    return c.json(results);
-  } catch (error) {
-    return c.json({ error: 'Error al obtener productos' }, 500);
-  }
+	try {
+		const {results} = await c.env.DB.prepare(
+			'SELECT * FROM productos_inventario ORDER BY nombre'
+		).all();
+		return c.json(results);
+	} catch (error) {
+		return c.json({error: 'Error al obtener productos'}, 500);
+	}
 })
 
 // API Inventario - Obtener inventario del día
 app.get('/api/inventario/dia/:fecha', async (c) => {
-  try {
-    const fecha = c.req.param('fecha');
-    const { results } = await c.env.DB.prepare(
-      'SELECT * FROM inventario_diario WHERE fecha = ?'
-    ).bind(fecha).all();
-    return c.json(results);
-  } catch (error) {
-    return c.json({ error: 'Error al obtener inventario' }, 500);
-  }
+	try {
+		const fecha = c.req.param('fecha');
+		const {results} = await c.env.DB.prepare(
+			'SELECT * FROM inventario_diario WHERE fecha = ?'
+		).bind(fecha).all();
+		return c.json(results);
+	} catch (error) {
+		return c.json({error: 'Error al obtener inventario'}, 500);
+	}
 })
 
 // API Inventario - Guardar inventario
 app.post('/api/inventario/guardar', async (c) => {
-  try {
-    const { inventario } = await c.req.json();
-    
-    // Preparar statements
-    const stmt = c.env.DB.prepare(`
+	try {
+		const {inventario} = await c.req.json();
+
+		// Preparar statements
+		const stmt = c.env.DB.prepare(`
       INSERT OR REPLACE INTO inventario_diario 
       (producto_id, fecha, cantidad_inicial, cantidad_final, precio_unitario)
       VALUES (?, ?, ?, ?, ?)
     `);
-    
-    // Ejecutar en batch
-    const batch = inventario.map((item: any) => 
-      stmt.bind(item.producto_id, item.fecha, item.cantidad_inicial, item.cantidad_final, item.precio_unitario)
-    );
-    
-    await c.env.DB.batch(batch);
-    
-    return c.json({ success: true });
-  } catch (error) {
-    console.error('Error al guardar inventario:', error);
-    return c.json({ error: 'Error al guardar inventario' }, 500);
-  }
+
+		// Ejecutar en batch
+		const batch = inventario.map((item: any) =>
+			stmt.bind(item.producto_id, item.fecha, item.cantidad_inicial, item.cantidad_final, item.precio_unitario)
+		);
+
+		await c.env.DB.batch(batch);
+
+		return c.json({success: true});
+	} catch (error) {
+		console.error('Error al guardar inventario:', error);
+		return c.json({error: 'Error al guardar inventario'}, 500);
+	}
 })
 
 // API Inventario - Obtener historial
 app.get('/api/inventario/historial', async (c) => {
-  try {
-    const { results } = await c.env.DB.prepare(`
+	try {
+		const {results} = await c.env.DB.prepare(`
       SELECT 
         fecha,
         SUM((cantidad_inicial - cantidad_final) * precio_unitario) as total
@@ -146,109 +146,109 @@ app.get('/api/inventario/historial', async (c) => {
       ORDER BY fecha DESC
       LIMIT 30
     `).all();
-    return c.json(results);
-  } catch (error) {
-    return c.json({ error: 'Error al obtener historial' }, 500);
-  }
+		return c.json(results);
+	} catch (error) {
+		return c.json({error: 'Error al obtener historial'}, 500);
+	}
 })
 
 // Menu data
 const menuData = {
-  hamburguesas: [
-    { nombre: "Asadera", ingredientes: "Carne+Q.Asadero", precio: 63 },
-    { nombre: "Especial", ingredientes: "Carne+Carnes Frías", precio: 63 },
-    { nombre: "Doble", ingredientes: "Carne+Jamón+Q.Amarillo", precio: 60 },
-    { nombre: "Champiqueso", ingredientes: "Carne+Champiñón+Q.Asadero", precio: 76 },
-    { nombre: "Petra", ingredientes: "Carne+Q.Asadero+Tocino", precio: 78 },
-    { nombre: "Campechana", ingredientes: "Asadera+Jamón+Q.Amarillo", precio: 73 },
-    { nombre: "Ejecutiva", ingredientes: "Carne+Carnes Frías+Salchicha", precio: 95 },
-    { nombre: "Española", ingredientes: "Carne+Q.Asadero+Salchicha", precio: 95 },
-    { nombre: "Embajadora", ingredientes: "Carne+Carnes Frías+Q.Asadero+Salchicha", precio: 108 },
-    { nombre: "Americana", ingredientes: "Doble Carne+Doble Q.Amarillo", precio: 100 },
-    { nombre: "Choriqueso", ingredientes: "Chorizo+Q.Asadero", precio: 45 },
-    { nombre: "Ranchera", ingredientes: "Carne+Chorizo+Q.Asadero", precio: 76 },
-    { nombre: "Hawaiana", ingredientes: "Carne+Piña+Q.Asadero", precio: 76 },
-    { nombre: "Hawaiana Especial", ingredientes: "Carne+Piña+Q.Asadero+Carnes Frías", precio: 89 },
-    { nombre: "Especial Asadera", ingredientes: "Carne+Q.Asadero+Carnes Frías", precio: 76 },
-    { nombre: "Ahumada", ingredientes: "Chuleta", precio: 50 },
-    { nombre: "Ahumada Especial", ingredientes: "Chuleta+Carnes Frías", precio: 63 },
-    { nombre: "Mexicana", ingredientes: "Chuleta+Carne", precio: 84 },
-    { nombre: "Norteña", ingredientes: "Carne+Chuleta+Q.Asadero", precio: 97 },
-    { nombre: "Italiana", ingredientes: "Chuleta+Q.Asadero", precio: 63 },
-    { nombre: "Extravagante", ingredientes: "Carne+Chuleta+Q.Asadero+Carnes Frías", precio: 110 },
-    { nombre: "Descarnada", ingredientes: "Carnes Frías+Q.Amarillo", precio: 48 },
-    { nombre: "Descarnada Asadero", ingredientes: "Carnes Frías+Q.Amarillo+Q.Asadero", precio: 61 },
-    { nombre: "Sencilla", ingredientes: "Carne de Res", precio: 50 },
-    { nombre: "Big Sencilla", ingredientes: "2 Carnes de Res", precio: 84 },
-    { nombre: "Costeña", ingredientes: "Camarón+Q.Asadero+Tocino+Ch.Morrón+Sal.Inglesa", precio: 96 },
-    { nombre: "Super Costeña", ingredientes: "Camarón+Q.Asadero+Carne de Res+Tocino+Ch.Morrón", precio: 130 },
-    { nombre: "La Popotiña", ingredientes: "Carne de Pierna+Tocino+Chile Morrón+Q.Asadero", precio: 82 },
-    { nombre: "Grosera", ingredientes: "Salchicha para Asar+Q.Asadero+Tocino", precio: 60 },
-    { nombre: "Super Grosera", ingredientes: "Salchicha para Asar+Q.Asadero+Tocino+Carne de Res", precio: 94 }
-  ],
-  hotdogs: [
-    { nombre: "Dogo de Pavo", ingredientes: "Salchicha de Pavo", precio: 50 },
-    { nombre: "Grosero", ingredientes: "Salchicha para Asar+Q.Asadero+Tocino Rebanado", precio: 60 },
-    { nombre: "Asadero", ingredientes: "Salchicha+Q.Asadero", precio: 63 },
-    { nombre: "Big Grosero", ingredientes: "Grosero+Carnes Frías", precio: 76 },
-    { nombre: "Choriqueso", ingredientes: "Salchicha+Chorizo+Q.Asadero", precio: 76 },
-    { nombre: "Champiqueso", ingredientes: "Salchicha+Champiñones+Q.Asadero", precio: 63 },
-    { nombre: "Campechano", ingredientes: "Asadero+Jamón+Q.Amarillo", precio: 73 },
-    { nombre: "Especial", ingredientes: "Salchicha+C.Frías", precio: 63 },
-    { nombre: "Hawaiano", ingredientes: "Salchicha+Q.Asadero+Piña", precio: 76 },
-    { nombre: "Hawaiano Especial", ingredientes: "Salchicha+Q.Asadero+Piña+C.Frías", precio: 89 },
-    { nombre: "Doble", ingredientes: "Salchicha+Jamón+Q.Amarillo", precio: 60 },
-    { nombre: "Descarnado", ingredientes: "Jamón+Pastel+Q.de Puerco+Mortadela+Salami", precio: 48 },
-    { nombre: "de Pierna", ingredientes: "Salchicha de Pierna", precio: 48 }
-  ],
-  sincronizadas: [
-    { nombre: "Sincronizada Sencilla", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo", precio: 51 },
-    { nombre: "Sincronizada Especial", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Pierna", precio: 81 },
-    { nombre: "Sincronizada Super", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Champiñones", precio: 64 },
-    { nombre: "Sincronizada Matona", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Pierna+Salchicha Grosera", precio: 125 },
-    { nombre: "Sincronizada Costeña", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Camarón+Pierna", precio: 125 }
-  ],
-  tortas: [
-    { nombre: "Torta Sencilla", ingredientes: "Telera+Pierna", precio: 50 },
-    { nombre: "Torta Especial", ingredientes: "Carnes Frías+Pierna", precio: 63 },
-    { nombre: "Torta Asadera", ingredientes: "Pierna+Q.Asadero", precio: 63 },
-    { nombre: "Torta Cubana", ingredientes: "Jamón+Q.Asadero+Salchicha+Pierna", precio: 101 }
-  ],
-  burros: [
-    { nombre: "Burro Sencillo", ingredientes: "Carne de Pierna", precio: 50 },
-    { nombre: "Burro Asadero", ingredientes: "Carne de Pierna+Q.Asadero", precio: 63 },
-    { nombre: "Burro Especial", ingredientes: "Carne de Pierna+Carnes Frías", precio: 63 },
-    { nombre: "Burro Costeño", ingredientes: "Carne de Pierna+Camarón+Q.Asadero", precio: 106 }
-  ],
-  papas: [
-    { nombre: "Papas a la Francesa Chicas", ingredientes: "Papas fritas doradas", precio: 45 },
-    { nombre: "Papas a la Francesa Grandes", ingredientes: "Papas fritas doradas", precio: 50 }
-  ],
-  bebidas: [
-    { nombre: "Coca-Cola", precio: 30 },
-    { nombre: "Sprite", precio: 30 },
-    { nombre: "Fanta", precio: 30 },
-    { nombre: "Fresca", precio: 30 },
-    { nombre: "Agua de Jamaica", precio: 30 },
-    { nombre: "Agua de Horchata", precio: 30 }
-  ],
-  ingredientesExtra: [
-    { nombre: "Carne", precio: 34 },
-    { nombre: "Carnes Frías", precio: 13 },
-    { nombre: "Q. Asadero", precio: 13 },
-    { nombre: "Salchicha para Asar", precio: 44 },
-    { nombre: "Piña", precio: 13 },
-    { nombre: "Champiñón", precio: 13 },
-    { nombre: "Salchicha de Pavo", precio: 34 },
-    { nombre: "Chuleta", precio: 34 },
-    { nombre: "Camarón", precio: 46 },
-    { nombre: "Tocino", precio: 15 },
-    { nombre: "Carne de Pierna", precio: 34 },
-    { nombre: "Chorizo", precio: 13 },
-    { nombre: "Q. Amarillo", precio: 8 }
-  ],
-  verduras: ["Jitomate", "Cebolla", "Chile"],
-  aderezos: ["Crema", "Mayonesa", "Catsup", "Mostaza"]
+	hamburguesas: [
+		{nombre: "Asadera", ingredientes: "Carne+Q.Asadero", precio: 67},
+		{nombre: "Especial", ingredientes: "Carne+Carnes Frías", precio: 67},
+		{nombre: "Doble", ingredientes: "Carne+Jamón+Q.Amarillo", precio: 64},
+		{nombre: "Champiqueso", ingredientes: "Carne+Champiñón+Q.Asadero", precio: 82},
+		{nombre: "Petra", ingredientes: "Carne+Q.Asadero+Tocino", precio: 84},
+		{nombre: "Campechana", ingredientes: "Asadera+Jamón+Q.Amarillo", precio: 79},
+		{nombre: "Ejecutiva", ingredientes: "Carne+Carnes Frías+Salchicha", precio: 101},
+		{nombre: "Española", ingredientes: "Carne+Q.Asadero+Salchicha", precio: 101},
+		{nombre: "Embajadora", ingredientes: "Carne+Carnes Frías+Q.Asadero+Salchicha", precio: 116},
+		{nombre: "Americana", ingredientes: "Doble Carne+Doble Q.Amarillo", precio: 112},
+		{nombre: "Choriqueso", ingredientes: "Chorizo+Q.Asadero", precio: 52},
+		{nombre: "Ranchera", ingredientes: "Carne+Chorizo+Q.Asadero", precio: 82},
+		{nombre: "Hawaiana", ingredientes: "Carne+Piña+Q.Asadero", precio: 82},
+		{nombre: "Hawaiana Especial", ingredientes: "Carne+Piña+Q.Asadero+Carnes Frías", precio: 97},
+		{nombre: "Especial Asadera", ingredientes: "Carne+Q.Asadero+Carnes Frías", precio: 82},
+		{nombre: "Ahumada", ingredientes: "Chuleta", precio: 52},
+		{nombre: "Ahumada Especial", ingredientes: "Chuleta+Carnes Frías", precio: 67},
+		{nombre: "Mexicana", ingredientes: "Chuleta+Carne", precio: 88},
+		{nombre: "Norteña", ingredientes: "Carne+Chuleta+Q.Asadero", precio: 103},
+		{nombre: "Italiana", ingredientes: "Chuleta+Q.Asadero", precio: 67},
+		{nombre: "Extravagante", ingredientes: "Carne+Chuleta+Q.Asadero+Carnes Frías", precio: 118},
+		{nombre: "Descarnada", ingredientes: "Carnes Frías+Q.Amarillo", precio: 52},
+		{nombre: "Descarnada Asadero", ingredientes: "Carnes Frías+Q.Amarillo+Q.Asadero", precio: 65},
+		{nombre: "Sencilla", ingredientes: "Carne de Res", precio: 52},
+		{nombre: "Big Sencilla", ingredientes: "2 Carnes de Res", precio: 88},
+		{nombre: "Costeña", ingredientes: "Camarón+Q.Asadero+Tocino+Ch.Morrón+Sal.Inglesa", precio: 102},
+		{nombre: "Super Costeña", ingredientes: "Camarón+Q.Asadero+Carne de Res+Tocino+Ch.Morrón", precio: 138},
+		{nombre: "La Popotiña", ingredientes: "Carne de Pierna+Tocino+Chile Morrón+Q.Asadero", precio: 88},
+		{nombre: "Grosera", ingredientes: "Salchicha para Asar+Q.Asadero+Tocino", precio: 62},
+		{nombre: "Super Grosera", ingredientes: "Salchicha para Asar+Q.Asadero+Tocino+Carne de Res", precio: 98}
+	],
+	hotdogs: [
+		{nombre: "Dogo de Pavo", ingredientes: "Salchicha de Pavo", precio: 52},
+		{nombre: "Grosero", ingredientes: "Salchicha para Asar+Q.Asadero+Tocino Rebanado", precio: 62},
+		{nombre: "Asadero", ingredientes: "Salchicha+Q.Asadero", precio: 67},
+		{nombre: "Big Grosero", ingredientes: "Grosero+Carnes Frías", precio: 82},
+		{nombre: "Choriqueso", ingredientes: "Salchicha+Chorizo+Q.Asadero", precio: 82},
+		{nombre: "Champiqueso", ingredientes: "Salchicha+Champiñones+Q.Asadero", precio: 82},
+		{nombre: "Campechano", ingredientes: "Asadero+Jamón+Q.Amarillo", precio: 79},
+		{nombre: "Especial", ingredientes: "Salchicha+C.Frías", precio: 67},
+		{nombre: "Hawaiano", ingredientes: "Salchicha+Q.Asadero+Piña", precio: 82},
+		{nombre: "Hawaiano Especial", ingredientes: "Salchicha+Q.Asadero+Piña+C.Frías", precio: 97},
+		{nombre: "Doble", ingredientes: "Salchicha+Jamón+Q.Amarillo", precio: 64},
+		{nombre: "Descarnado", ingredientes: "Jamón+Pastel+Q.de Puerco+Mortadela+Salami", precio: 50},
+		{nombre: "de Pierna", ingredientes: "Salchicha de Pierna", precio: 50}
+	],
+	sincronizadas: [
+		{nombre: "Sincronizada Sencilla", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo", precio: 53},
+		{nombre: "Sincronizada Especial", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Pierna", precio: 85},
+		{nombre: "Sincronizada Super", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Champiñones", precio: 68},
+		{nombre: "Sincronizada Matona", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Pierna+Salchicha Grosera", precio: 131},
+		{nombre: "Sincronizada Costeña", ingredientes: "T.Harina+Jamón+Q.Asadero+Q.Amarillo+Camarón+Pierna", precio: 131}
+	],
+	tortas: [
+		{nombre: "Torta Sencilla", ingredientes: "Telera+Pierna", precio: 52},
+		{nombre: "Torta Especial", ingredientes: "Carnes Frías+Pierna", precio: 67},
+		{nombre: "Torta Asadera", ingredientes: "Pierna+Q.Asadero", precio: 67},
+		{nombre: "Torta Cubana", ingredientes: "Jamón+Q.Asadero+Salchicha+Pierna", precio: 109}
+	],
+	burros: [
+		{nombre: "Burro Sencillo", ingredientes: "Carne de Pierna", precio: 52},
+		{nombre: "Burro Asadero", ingredientes: "Carne de Pierna+Q.Asadero", precio: 67},
+		{nombre: "Burro Especial", ingredientes: "Carne de Pierna+Carnes Frías", precio: 67},
+		{nombre: "Burro Costeño", ingredientes: "Carne de Pierna+Camarón+Q.Asadero", precio: 112}
+	],
+	papas: [
+		{nombre: "Papas a la Francesa Chicas", ingredientes: "Papas fritas doradas", precio: 45},
+		{nombre: "Papas a la Francesa Grandes", ingredientes: "Papas fritas doradas", precio: 50}
+	],
+	bebidas: [
+		{nombre: "Coca-Cola", precio: 30}
+    {nombre: "Sprite", precio: 30}
+    {nombre: "Fanta", precio: 30}
+    {nombre: "Fresca", precio: 30}
+    {nombre: "Agua de Jamaica", precio: 30}
+    {nombre: "Agua de Horchata", precio: 30}
+	],
+	ingredientesExtra: [
+		{nombre: "Carne", precio: 34}
+    {nombre: "Carnes Frías", precio: 13}
+    {nombre: "Q. Asadero", precio: 13}
+    {nombre: "Salchicha para Asar", precio: 44}
+    {nombre: "Piña", precio: 13}
+    {nombre: "Champiñón", precio: 13}
+    {nombre: "Salchicha de Pavo", precio: 34}
+    {nombre: "Chuleta", precio: 34}
+    {nombre: "Camarón", precio: 46}
+    {nombre: "Tocino", precio: 15}
+    {nombre: "Carne de Pierna", precio: 34}
+    {nombre: "Chorizo", precio: 13}
+    {nombre: "Q. Amarillo", precio: 8}
+	],
+	verduras: ["Jitomate", "Cebolla", "Chile"],
+	aderezos: ["Crema", "Mayonesa", "Catsup", "Mostaza"]
 }
 
 const htmlContent = `
