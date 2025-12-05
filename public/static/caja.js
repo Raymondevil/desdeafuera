@@ -90,6 +90,7 @@ const productoscaja = {
 	]
 };
 
+
 // Estado de la caja
 let ticket = [];
 let currentProductForExtras = null;
